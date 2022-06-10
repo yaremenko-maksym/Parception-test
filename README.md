@@ -6,7 +6,7 @@
 
 React, JavaScript, React Router v6, Redux Toolkit, Module SCSS, Facebook Auth API. 
 
-### Available functional
+### Available functionality
 
 `Tab autocomplete` - Press tab when using search
 
