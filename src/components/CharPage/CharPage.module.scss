@@ -1,0 +1,142 @@
+.container {
+  box-sizing: border-box;
+  margin: 40px auto;
+  padding: 40px;
+  max-width: fit-content;
+
+  background-color: #fff;
+  border-radius: 60px
+};
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  &__title {
+    margin-bottom: 10px;
+
+    font-size: 30px;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  &__image {
+    width: 300px;
+    height: 300px;
+    margin-bottom: 10px;
+
+    border: 1px solid black;
+    border-radius: 20px;
+  }
+
+  &__species {
+    margin-bottom: 5px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  &__gender {
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+
+  &__location {
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: bold;
+
+    &Link {
+      text-decoration: none;
+      color: black;
+
+      &:visited {
+        color: rgb(31, 58, 34);
+      }
+    }
+  }
+
+  &__episodeList {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: 300px;
+    margin-bottom: 10px;
+
+    list-style: none;
+
+    &Item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 5px;
+      border-radius: 5px;
+      background-color: rgb(158, 255, 161);
+      min-width: 20px;
+      min-height: 20px;
+
+      &Link {
+        font-size: 15px;
+        text-decoration: none;
+        color: black;
+      }
+    }
+  }
+
+  &__status {
+    margin-bottom: 10px;
+    font-size: 20px;
+    
+    &__alive {
+      color: green;
+    }
+
+    &__dead {
+      color: red;
+    }
+
+    &__unknown {
+      color: rgb(168, 168, 110);
+    }
+  }
+
+  &__created {
+    font-size: 20px;
+    font-weight: bold;
+  }
+}
+
+.changePhoto {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 10px;
+
+  &__input {
+    padding: 5px;
+
+    border-radius: 5px;
+    border: 1px solid rgb(93, 170, 93);
+  }
+
+  &__error {
+    position: absolute;
+    top: 27px;
+
+    font-size: 10px;
+    color: red
+  }
+
+  &__button {
+    padding: 10px;
+    color: white;
+
+    border: none;
+    border-radius: 5px;
+    background-color: rgb(93, 170, 93);
+  }
+}
+
