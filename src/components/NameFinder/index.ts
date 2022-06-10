@@ -1,1 +1,0 @@
-export { NameFinder } from './NameFinder';
