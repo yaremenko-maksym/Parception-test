@@ -153,9 +153,7 @@ export const CharPage: React.FC = memo(() => {
                 key={link}
                 className={styles.card__episodeListItem}
               >
-                <a href={link} className={styles.card__episodeListItemLink}>
-                  {link.split('/')[5]}
-                </a>
+                {link.split('/')[5]}
               </li>
             ))}
           </ul>
