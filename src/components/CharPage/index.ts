@@ -1,0 +1,1 @@
+export { CharPage } from './CharPage';

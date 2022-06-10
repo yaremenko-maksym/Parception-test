@@ -1,27 +1,31 @@
 import React from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.scss';
-
-interface Props {
-  onClick: () => void;
-}
-
-export const Provider: React.FC<Props> = React.memo(
-  ({ onClick, children }) => (
-    <button
-      type="button"
-      onClick={onClick}
-    >
-      {children}
-    </button>
-  ),
-);
+import { CharPage } from './components/CharPage';
+import { CharsList } from './components/CharsList';
+import { MyProfilePage } from './components/MyProfilePage';
+import { Header } from './components/Header';
+import { RequireAuth } from './components/RequireAuth';
 
 export const App: React.FC = () => {
   return (
-    <div className="starter">
-      <Provider onClick={() => ({})}>
-        <TodoList />
-      </Provider>
+    <div className="App">
+      <Header />
+
+      <Routes>
+        <Route path="/list" element={<CharsList />} />
+        <Route path="/list/:charID" element={<CharPage />} />
+        <Route
+          path="/profile"
+          element={(
+            <RequireAuth>
+              <MyProfilePage />
+            </RequireAuth>
+          )}
+        />
+        <Route path="/" element={<Navigate to="/list" />} />
+        <Route path="*" element={<Navigate to="/list" />} />
+      </Routes>
     </div>
   );
 };
