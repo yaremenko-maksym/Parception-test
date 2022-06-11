@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, {
   memo,
   useCallback,
@@ -17,10 +19,9 @@ import {
 } from '../../store/CharsListReducer';
 
 import { Loader } from '../Loader';
-import { GoBack } from '../GoBackButton';
 import { urlValidator } from '../../functions/URLValidator';
 
-import styles from './CharPage.module.scss';
+import './CharPage.scss';
 
 export const CharPage: React.FC = memo(() => {
   const { charID } = useParams();
@@ -67,111 +68,128 @@ export const CharPage: React.FC = memo(() => {
       dispatch(setIsCharPageLoading(true));
       dispatch(loadCharByIDFromServer(+charID));
     }
-  }, []);
+  }, [charID]);
 
   return (
-    <div className={styles.container}>
-      <GoBack />
-
+    <div className="container charPage-container bg-dark">
       {isCharPageLoading && <Loader size="big" />}
 
       {currentChar && (
-        <div className={styles.card}>
-          <h2 className={styles.card__title}>
-            {currentChar.name}
-          </h2>
+        <div className="d-flex flex-column">
+          <div>
+            <h2 className="text-light">
+              {currentChar.name}
+            </h2>
+          </div>
 
-          <img
-            src={currentChar.image}
-            alt={`${currentChar.name} poster`}
-            className={styles.card__image}
-          />
+          <div className="d-flex flex-column flex-md-row">
+            <div className="me-3">
+              <img
+                src={currentChar.image}
+                alt={`${currentChar.name} poster`}
+                className="img-thumbnail"
+              />
 
-          {user && (
-            <div className={styles.changePhoto}>
-              {isPhotoChangeInputVisible ? (
-                <>
-                  <input
-                    type="text"
-                    value={newPhotoUrl}
-                    onChange={({ target }) => {
-                      setIsURLValid(true);
-                      setNewPhotoUrl(target.value);
-                    }}
-                    placeholder="Image URL..."
-                    className={styles.changePhoto__input}
-                  />
+              {user && (
+                <div>
+                  {isPhotoChangeInputVisible ? (
+                    <div className="d-flex flex-column">
+                      <input
+                        type="text"
+                        value={newPhotoUrl}
+                        onChange={({ target }) => {
+                          setIsURLValid(true);
+                          setNewPhotoUrl(target.value);
+                        }}
+                        placeholder="Image URL..."
+                        className="form-control mb-1"
+                      />
 
-                  {!isURLValid && (
-                    <p className={styles.changePhoto__error}>*Invalid url</p>
+                      {!isURLValid && (
+                        <p className="form-helper text-danger">*Invalid url</p>
+                      )}
+
+                      <button
+                        type="submit"
+                        onClick={(event) => {
+                          handleNewImgUpload(event);
+                        }}
+                        className="text-light btn btn-success mb-1"
+                      >
+                        Apply Change
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsPhotoChangeInputVisible(false);
+                        }}
+                        className="text-light btn btn-danger"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <i
+                      className="fas fa-camera-retro fa-2x text-success clickable"
+                      onClick={() => setIsPhotoChangeInputVisible(true)}
+                    >
+                    </i>
                   )}
-
-                  <button
-                    type="submit"
-                    onClick={(event) => {
-                      handleNewImgUpload(event);
-                    }}
-                    className={styles.changePhoto__button}
-                  >
-                    Apply Change
-                  </button>
-                </>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setIsPhotoChangeInputVisible(true)}
-                  className={styles.changePhoto__button}
-                >
-                  Change Photo
-                </button>
+                </div>
               )}
             </div>
-          )}
 
-          <p className={styles.card__species}>
-            {currentChar.species}
-          </p>
+            <div className="d-flex flex-column info">
+              <h3 className="text-light">
+                {currentChar.species}
+              </h3>
 
-          <p className={styles.card__gender}>
-            {currentChar.gender}
-          </p>
+              <h3 className="text-light">
+                {currentChar.gender}
+              </h3>
 
-          <p className={styles.card__location}>
-            {'Location: '}
-            <a
-              href={currentChar.location.url}
-              className={styles.card__locationLink}
-            >
-              {currentChar.location.name}
-            </a>
-          </p>
+              <h3 className="text-light">
+                {'Location: '}
+                {currentChar.location.name}
+              </h3>
 
-          <ul className={styles.card__episodeList}>
-            {'Episodes: '}
-            {currentChar.episode.map(link => (
-              <li
-                key={link}
-                className={styles.card__episodeListItem}
+              <button
+                className="btn btn-light dropdown-toggle"
+                type="button"
+                id="dropdownMenuButton"
+                data-mdb-toggle="dropdown"
+                aria-expanded="false"
               >
-                {link.split('/')[5]}
-              </li>
-            ))}
-          </ul>
+                Episodes
+              </button>
+              <ul
+                className="dropdown-menu my-dropdown"
+              >
+                {currentChar.episode.map(link => (
+                  <li
+                    key={link}
+                    className="dropdown-item"
+                  >
+                    {link.split('/')[5]}
+                  </li>
+                ))}
+              </ul>
 
-          <p
-            className={classNames(
-              styles.card__status,
-              { [styles.card__status__alive]: currentChar.status === 'Alive' },
-              { [styles.card__status__dead]: currentChar.status === 'Dead' },
-              { [styles.card__status__unknown]: currentChar.status === 'unknown' },
-            )}
-          >
-            {currentChar.status}
-          </p>
+              <h3 className={classNames(
+                { 'text-success': currentChar.status === 'Alive' },
+                { 'text-danger': currentChar.status === 'Dead' },
+                { 'text-warning': currentChar.status === 'unknown' },
+              )}
+              >
+                {currentChar.status}
+              </h3>
 
-          <p className={styles.card__created}>
-            {`Created date: ${currentCharDate?.day}.${currentCharDate?.month}.${currentCharDate?.year}`}
-          </p>
+              <h3 className="text-light">
+                {`Created date: ${currentCharDate?.day}.${currentCharDate?.month}.${currentCharDate?.year}`}
+              </h3>
+            </div>
+          </div>
         </div>
       )}
     </div>

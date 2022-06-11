@@ -2,9 +2,11 @@
 
 - [DEMO LINK](https://yaremenko-maksym.github.io/Parception-test/)
 
+To get all the functionality make sure that you are logged in with a Facebook!
+
 ### Technologies
 
-React, TypeScript, React Router v6, Redux Toolkit, Module SCSS, Facebook Auth API. 
+React, TypeScript, React Router v6, Redux Toolkit, SCSS, Facebook Auth API, MDBootstrap 
 
 ### Available functionality
 
@@ -18,7 +20,7 @@ React, TypeScript, React Router v6, Redux Toolkit, Module SCSS, Facebook Auth AP
 
 `Like/dislike` - To like/dislike you need to authorize with facebook 
 
-`Saved list of liked/disliked characters` - Data about your liked/disliked characters saved in `localestorage`
+`Saved list of liked/disliked characters` - Data about your liked/disliked characters saved in `localStorage`
 
 `Change character photo` - Only for authorized users
 

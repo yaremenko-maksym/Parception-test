@@ -13,3 +13,9 @@ export const getCharacterByIDFromServer = async (id: number) => {
 
   return response.json();
 };
+
+export const getFilteredCharactersFromServer = async (query: string) => {
+  const response = await fetch(`${BASE_URL}/character/?name=${query}`);
+
+  return response.json();
+};
