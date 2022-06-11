@@ -4,7 +4,7 @@
 
 ### Technologies
 
-React, JavaScript, React Router v6, Redux Toolkit, Module SCSS, Facebook Auth API. 
+React, TypeScript, React Router v6, Redux Toolkit, Module SCSS, Facebook Auth API. 
 
 ### Available functionality
 
