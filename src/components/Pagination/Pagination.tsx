@@ -56,31 +56,32 @@ export const Pagination: React.FC = memo(() => {
   }, [currentPage, total]);
 
   return (
-    <div className="pagination">
-      {/* <p className="pagination__title">
+    <div className="container pagination-container bg-dark d-flex justify-content-center align-items-center">
+      <nav className="Page navigation example">
+        {/* <p className="pagination__title">
         {`${firstElementOnPage} - ${lastElementOnPage} of ${total}`}
       </p> */}
 
-      <div className="pagination__buttons">
-        <button
-          type="button"
-          onClick={() => {
-            searchParams.set('page', (+currentPage - 1).toString());
-            navigate(`?page=${(+currentPage - 1).toString()}`);
-          }}
-          disabled={isPrevDisabled}
-          className="pagination__button"
-        >
-          &laquo;
-        </button>
+        <div className="pagination">
+          <button
+            type="button"
+            onClick={() => {
+              searchParams.set('page', (+currentPage - 1).toString());
+              navigate(`?page=${(+currentPage - 1).toString()}`);
+            }}
+            disabled={isPrevDisabled}
+            className="page-item page-link pagination-link"
+            aria-label="Previous"
+          >
+            <span aria-hidden="true">&laquo;</span>
+          </button>
 
-        <div className="pagination__buttons-pages">
           {visiblePages.map(item => {
             if (item.value === '...') {
               return (
                 <p
                   key={item.id}
-                  className="pagination__buttons-dots"
+                  className="page-item page-link pagination-link"
                 >
                   {item.value}
                 </p>
@@ -96,7 +97,7 @@ export const Pagination: React.FC = memo(() => {
                   navigate(`?page=${item.value}`);
                 }}
                 className={classNames(
-                  'pagination__button',
+                  'page-link pagination-link',
                   { 'pagination__button--selected': +currentPage === item.value },
                 )}
               >
@@ -104,20 +105,21 @@ export const Pagination: React.FC = memo(() => {
               </button>
             );
           })}
-        </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            searchParams.set('page', (+currentPage + 1).toString());
-            navigate(`?page=${(+currentPage + 1).toString()}`);
-          }}
-          disabled={isNextDisabled}
-          className="pagination__button"
-        >
-          &raquo;
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={() => {
+              searchParams.set('page', (+currentPage + 1).toString());
+              navigate(`?page=${(+currentPage + 1).toString()}`);
+            }}
+            disabled={isNextDisabled}
+            className="page-item page-link pagination-link"
+            aria-label="Next"
+          >
+            <span aria-hidden="true">&raquo;</span>
+          </button>
+        </div>
+      </nav>
     </div>
   );
 });

@@ -1,0 +1,27 @@
+.text-light:hover {
+  color: green;
+}
+
+.dropdown-item.active {
+  color: #eee;
+  background-color: rgba(var(--mdb-dark-rgb),var(--mdb-bg-opacity));
+}
+
+.facebook {
+  font-weight: 700;
+  -webkit-font-smoothing: antialiased;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-size: calc(.27548vw + 12.71074px);
+  text-decoration: none;
+  text-transform: uppercase;
+  background-color: #4c69ba;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+
+  & .fa {
+    margin-right: 10px;
+  }
+}

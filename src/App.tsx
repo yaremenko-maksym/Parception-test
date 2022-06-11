@@ -6,26 +6,31 @@ import { CharsList } from './components/CharsList';
 import { MyProfilePage } from './components/MyProfilePage';
 import { Header } from './components/Header';
 import { RequireAuth } from './components/RequireAuth';
+import { Footer } from './components/Footer';
 
 export const App: React.FC = () => {
   return (
     <div className="App">
       <Header />
 
-      <Routes>
-        <Route path="/list" element={<CharsList />} />
-        <Route path="/list/:charID" element={<CharPage />} />
-        <Route
-          path="/profile"
-          element={(
-            <RequireAuth>
-              <MyProfilePage />
-            </RequireAuth>
-          )}
-        />
-        <Route path="/" element={<Navigate to="/list" />} />
-        <Route path="*" element={<Navigate to="/list" />} />
-      </Routes>
+      <main className="main">
+        <Routes>
+          <Route path="/list" element={<CharsList />} />
+          <Route path="/list/:charID" element={<CharPage />} />
+          <Route
+            path="/profile"
+            element={(
+              <RequireAuth>
+                <MyProfilePage />
+              </RequireAuth>
+            )}
+          />
+          <Route path="/" element={<Navigate to="/list" />} />
+          <Route path="*" element={<Navigate to="/list" />} />
+        </Routes>
+      </main>
+
+      <Footer />
     </div>
   );
 };

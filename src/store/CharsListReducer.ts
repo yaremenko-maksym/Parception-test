@@ -2,13 +2,15 @@
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '.';
-import { getAllCharactersFromServer, getCharacterByIDFromServer } from '../api/api';
+import { getAllCharactersFromServer, getCharacterByIDFromServer, getFilteredCharactersFromServer } from '../api/api';
 import { Character } from '../types/Character';
 import { User } from '../types/User';
 
 interface CharsListState {
   chars: Character[],
   currentChar: Character | null,
+  filteredCharacters: Character[],
+  nameQuery: string,
   isListLoading: boolean,
   isCharPageLoading: boolean,
   nextPage: string | null,
@@ -21,6 +23,8 @@ interface CharsListState {
 const initialState: CharsListState = {
   chars: [],
   currentChar: null,
+  filteredCharacters: [],
+  nameQuery: '',
   isListLoading: false,
   isCharPageLoading: false,
   nextPage: null,
@@ -43,6 +47,15 @@ export const loadCharByIDFromServer = createAsyncThunk(
   'CharsList/loadCharByID',
   async (id: number) => {
     const response = await getCharacterByIDFromServer(id);
+
+    return response;
+  },
+);
+
+export const loadFilteredCharactersFromServer = createAsyncThunk(
+  'CharsList/loadFilteredCharacters',
+  async (query: string) => {
+    const response = await getFilteredCharactersFromServer(query);
 
     return response;
   },
@@ -115,6 +128,9 @@ const CharsListReducer = createSlice({
         state.currentChar.image = action.payload;
       }
     },
+    setCurrentQuery: (state, action: PayloadAction<string>) => {
+      state.nameQuery = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(loadCharsFromServer.fulfilled, (state, action) => {
@@ -129,6 +145,13 @@ const CharsListReducer = createSlice({
       state.currentChar = action.payload;
       state.isCharPageLoading = false;
     });
+    builder.addCase(loadFilteredCharactersFromServer.fulfilled, (state, action) => {
+      if (action.payload.results) {
+        state.filteredCharacters = action.payload.results;
+      } else {
+        state.filteredCharacters = [];
+      }
+    });
   },
 });
 
@@ -140,6 +163,7 @@ export const {
   setCurrentUserLikedChars,
   setCurrentUserDislikedChars,
   setCurrentCharPhoto,
+  setCurrentQuery,
 } = CharsListReducer.actions;
 
 export default CharsListReducer.reducer;
@@ -150,6 +174,9 @@ export const selectors = {
   },
   getLikedChars: (state: RootState) => {
     return state.CharsListReducer.user?.likedChars;
+  },
+  getFilteredCharacters: (state: RootState) => {
+    return state.CharsListReducer.filteredCharacters;
   },
   getDislikedChars: (state: RootState) => {
     return state.CharsListReducer.user?.dislikedChars;
@@ -177,5 +204,8 @@ export const selectors = {
   },
   getPagesCount: (state: RootState) => {
     return state.CharsListReducer.pagesCount;
+  },
+  getNameQuery: (state: RootState) => {
+    return state.CharsListReducer.nameQuery;
   },
 };

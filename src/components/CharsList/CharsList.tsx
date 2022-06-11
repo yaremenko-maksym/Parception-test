@@ -15,10 +15,9 @@ import {
   setIsListLoading,
 } from '../../store/CharsListReducer';
 import { Loader } from '../Loader';
-import { ControlPanel } from '../ControlPanel';
 import { Pagination } from '../Pagination';
 
-import styles from './CharsList.module.scss';
+import './CharsList.scss';
 
 export const CharsList: React.FC = memo(() => {
   const navigate = useNavigate();
@@ -40,37 +39,49 @@ export const CharsList: React.FC = memo(() => {
 
   return (
     <>
-      <ControlPanel />
-
-      <div className={styles.container}>
-        <ul className={styles.charsList}>
+      <div className="container bg-dark">
+        <ul className="list-group list-group-light list-container">
           {isListLoading && <Loader size="big" />}
           {chars.map(char => (
             <li
               key={char.id}
-              className={styles.item}
+              className="
+                clickable
+                bg-dark
+                char
+                list-group-item
+                d-flex
+                flex-md-row
+                flex-column
+                justify-space-between
+                align-items-start
+                align-items-md-center
+                border-success"
               onClick={() => {
                 dispatch(setCurrentChar(null));
                 navigate(`/list/${char.id}`);
               }}
             >
-              <div className={styles.item__infoContainer}>
+              <div
+                className="ms-2 me-2 mb-2 mb-md-0 d-flex justify-content-center align-items-center"
+                style={{ gap: '20px' }}
+              >
                 <img
                   src={char.image}
                   alt={`${char.name} poster`}
-                  className={styles.item__image}
+                  className="img-fluid rounded shadow-3 char__image"
                 />
 
-                <h3 className={styles.item__name}>
+                <h3 className="fw-bold text-light">
                   {char.name}
                 </h3>
 
                 <p
                   className={classNames(
-                    styles.item__status,
-                    { [styles.item__status__alive]: char.status === 'Alive' },
-                    { [styles.item__status__dead]: char.status === 'Dead' },
-                    { [styles.item__status__unknown]: char.status === 'unknown' },
+                    'badge rounded-pill badge-light',
+                    { 'text-success': char.status === 'Alive' },
+                    { 'text-danger': char.status === 'Dead' },
+                    { 'text-warning': char.status === 'unknown' },
                   )}
                 >
                   {char.status}
@@ -78,7 +89,14 @@ export const CharsList: React.FC = memo(() => {
               </div>
 
               {user && (
-                <div className={styles.item__buttons}>
+                <div className="
+                  btn-group
+                  me-2
+                  ms-2
+                  d-flex
+                  justify-content-end
+                  align-items-center"
+                >
                   <button
                     type="button"
                     onClick={(event) => {
@@ -86,16 +104,15 @@ export const CharsList: React.FC = memo(() => {
                       dispatch(setCurrentUserLikedChars(char));
                     }}
                     className={classNames(
-                      styles.item__button,
-                      styles.item__buttonLike,
+                      'btn btn-light btn-floating',
                       {
-                        [styles.item__buttonLikeActive]: likedChars?.some(likedChar => {
+                        'bg-success': likedChars?.some(likedChar => {
                           return likedChar.id === char.id;
                         }),
                       },
                     )}
                   >
-                    Like
+                    <i className="fas fa-thumbs-up"></i>
                   </button>
 
                   <button
@@ -105,16 +122,15 @@ export const CharsList: React.FC = memo(() => {
                       dispatch(setCurrentUserDislikedChars(char));
                     }}
                     className={classNames(
-                      styles.item__button,
-                      styles.item__buttonDislike,
+                      'btn btn-light btn-floating',
                       {
-                        [styles.item__buttonDislikeActive]: dislikedChars?.some(dislikedChar => {
+                        'bg-danger': dislikedChars?.some(dislikedChar => {
                           return dislikedChar.id === char.id;
                         }),
                       },
                     )}
                   >
-                    Dislike
+                    <i className="fas fa-thumbs-down"></i>
                   </button>
                 </div>
               )}

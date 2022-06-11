@@ -9,11 +9,9 @@ import {
   setCurrentUserLikedChars,
   selectors,
   setCurrentChar,
-  setUser,
 } from '../../store/CharsListReducer';
-import { GoBack } from '../GoBackButton';
 
-import styles from './MyProfilePage.module.scss';
+import './MyProfilePage.scss';
 
 export const MyProfilePage: React.FC = memo(() => {
   const navigate = useNavigate();
@@ -23,50 +21,67 @@ export const MyProfilePage: React.FC = memo(() => {
   const dislikedChars = useAppSelector(selectors.getDislikedChars);
 
   return (
-    <>
-      <GoBack />
-
-      <div className={styles.wrapper}>
-
-        <div className={styles.container}>
-          <h2 className={styles.charsList__title}>
+    <div className="container">
+      <div className="d-flex gap-3 flex-column flex-md-row">
+        <div className="bg-dark favoriteList-container">
+          <h2 className="text-light">
             Liked Chars List:
           </h2>
           {likedChars?.length ? (
-            <ul className={styles.charsList}>
+            <ul className="list-group list-group-light list-container">
               {likedChars.map(char => (
                 <li
                   key={char.id}
-                  className={styles.item}
+                  className="
+                    bg-dark
+                    char
+                    list-group-item
+                    d-flex
+                    flex-md-row
+                    flex-column
+                    justify-space-between
+                    align-items-start
+                    align-items-md-center
+                    border-success"
                   onClick={() => {
                     dispatch(setCurrentChar(null));
                     navigate(`/list/${char.id}`);
                   }}
                 >
-                  <div className={styles.item__infoContainer}>
+                  <div
+                    className="ms-2 me-2 mb-2 mb-md-0 d-flex justify-content-center align-items-center"
+                    style={{ gap: '20px' }}
+                  >
                     <img
                       src={char.image}
                       alt={`${char.name} poster`}
-                      className={styles.item__image}
+                      className="img-fluid rounded shadow-3 char__image"
                     />
 
-                    <h3 className={styles.item__name}>
+                    <h3 className="fw-bold text-light">
                       {char.name}
                     </h3>
 
                     <p
                       className={classNames(
-                        styles.item__status,
-                        { [styles.item__status__alive]: char.status === 'Alive' },
-                        { [styles.item__status__dead]: char.status === 'Dead' },
-                        { [styles.item__status__unknown]: char.status === 'unknown' },
+                        'badge rounded-pill badge-light',
+                        { 'text-success': char.status === 'Alive' },
+                        { 'text-danger': char.status === 'Dead' },
+                        { 'text-warning': char.status === 'unknown' },
                       )}
                     >
                       {char.status}
                     </p>
                   </div>
 
-                  <div className={styles.item__buttons}>
+                  <div className="
+                    btn-group
+                    me-2
+                    ms-2
+                    d-flex
+                    justify-content-end
+                    align-items-center"
+                  >
                     <button
                       type="button"
                       onClick={(event) => {
@@ -74,16 +89,15 @@ export const MyProfilePage: React.FC = memo(() => {
                         dispatch(setCurrentUserLikedChars(char));
                       }}
                       className={classNames(
-                        styles.item__button,
-                        styles.item__buttonLike,
+                        'btn btn-light btn-floating',
                         {
-                          [styles.item__buttonLikeActive]: likedChars.some(likedChar => {
+                          'bg-success': likedChars?.some(likedChar => {
                             return likedChar.id === char.id;
                           }),
                         },
                       )}
                     >
-                      Like
+                      <i className="fas fa-thumbs-up"></i>
                     </button>
 
                     <button
@@ -93,16 +107,15 @@ export const MyProfilePage: React.FC = memo(() => {
                         dispatch(setCurrentUserDislikedChars(char));
                       }}
                       className={classNames(
-                        styles.item__button,
-                        styles.item__buttonDislike,
+                        'btn btn-light btn-floating',
                         {
-                          [styles.item__buttonDislikeActive]: dislikedChars?.some(dislikedChar => {
+                          'bg-danger': dislikedChars?.some(dislikedChar => {
                             return dislikedChar.id === char.id;
                           }),
                         },
                       )}
                     >
-                      Dislike
+                      <i className="fas fa-thumbs-down"></i>
                     </button>
                   </div>
                 </li>
@@ -111,48 +124,67 @@ export const MyProfilePage: React.FC = memo(() => {
           ) : (
             <i>No liked characters yet</i>
           )}
-
         </div>
 
-        <div className={styles.container}>
-          <h2 className={styles.charsList__title}>
+        <div className="bg-dark favoriteList-container">
+          <h2 className="text-light">
             Disliked Chars List:
           </h2>
           {dislikedChars?.length ? (
-            <ul className={styles.charsList}>
+            <ul className="list-group list-group-light list-container">
               {dislikedChars.map(char => (
                 <li
                   key={char.id}
-                  className={styles.item}
+                  className="
+                  bg-dark
+                  char
+                  list-group-item
+                  d-flex
+                  flex-md-row
+                  flex-column
+                  justify-space-between
+                  align-items-start
+                  align-items-md-center
+                  border-success"
                   onClick={() => {
                     dispatch(setCurrentChar(null));
                     navigate(`/list/${char.id}`);
                   }}
                 >
-                  <div className={styles.item__infoContainer}>
+                  <div
+                    className="ms-2 me-2 mb-2 mb-md-0 d-flex justify-content-center align-items-center"
+                    style={{ gap: '20px' }}
+                  >
                     <img
                       src={char.image}
                       alt={`${char.name} poster`}
-                      className={styles.item__image}
+                      className="img-fluid rounded shadow-3 char__image"
                     />
 
-                    <h3 className={styles.item__name}>
+                    <h3 className="fw-bold text-light">
                       {char.name}
                     </h3>
 
                     <p
                       className={classNames(
-                        styles.item__status,
-                        { [styles.item__status__alive]: char.status === 'Alive' },
-                        { [styles.item__status__dead]: char.status === 'Dead' },
-                        { [styles.item__status__unknown]: char.status === 'unknown' },
+                        'badge rounded-pill badge-light',
+                        { 'text-success': char.status === 'Alive' },
+                        { 'text-danger': char.status === 'Dead' },
+                        { 'text-warning': char.status === 'unknown' },
                       )}
                     >
                       {char.status}
                     </p>
                   </div>
 
-                  <div className={styles.item__buttons}>
+                  <div className="
+                  btn-group
+                  me-2
+                  ms-2
+                  d-flex
+                  justify-content-end
+                  align-items-center"
+                  >
                     <button
                       type="button"
                       onClick={(event) => {
@@ -160,16 +192,15 @@ export const MyProfilePage: React.FC = memo(() => {
                         dispatch(setCurrentUserLikedChars(char));
                       }}
                       className={classNames(
-                        styles.item__button,
-                        styles.item__buttonLike,
+                        'btn btn-light btn-floating',
                         {
-                          [styles.item__buttonLikeActive]: likedChars?.some(likedChar => {
+                          'bg-success': likedChars?.some(likedChar => {
                             return likedChar.id === char.id;
                           }),
                         },
                       )}
                     >
-                      Like
+                      <i className="fas fa-thumbs-up"></i>
                     </button>
 
                     <button
@@ -179,16 +210,15 @@ export const MyProfilePage: React.FC = memo(() => {
                         dispatch(setCurrentUserDislikedChars(char));
                       }}
                       className={classNames(
-                        styles.item__button,
-                        styles.item__buttonDislike,
+                        'btn btn-light btn-floating',
                         {
-                          [styles.item__buttonDislikeActive]: dislikedChars.some(dislikedChar => {
+                          'bg-danger': dislikedChars?.some(dislikedChar => {
                             return dislikedChar.id === char.id;
                           }),
                         },
                       )}
                     >
-                      Dislike
+                      <i className="fas fa-thumbs-down"></i>
                     </button>
                   </div>
                 </li>
@@ -198,18 +228,7 @@ export const MyProfilePage: React.FC = memo(() => {
             <i>No disliked characters yet</i>
           )}
         </div>
-
       </div>
-      <button
-        type="button"
-        onClick={() => {
-          dispatch(setUser(null));
-          navigate('/list');
-        }}
-        className={styles.logOut}
-      >
-        Log Out
-      </button>
-    </>
+    </div>
   );
 });
