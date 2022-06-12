@@ -28,7 +28,7 @@ export const MyProfilePage: React.FC = memo(() => {
             Liked Chars List:
           </h2>
           {likedChars?.length ? (
-            <ul className="list-group list-group-light list-container">
+            <ul className="list-group list-group-light list-container clickable">
               {likedChars.map(char => (
                 <li
                   key={char.id}
@@ -131,7 +131,7 @@ export const MyProfilePage: React.FC = memo(() => {
             Disliked Chars List:
           </h2>
           {dislikedChars?.length ? (
-            <ul className="list-group list-group-light list-container">
+            <ul className="list-group list-group-light list-container clickable">
               {dislikedChars.map(char => (
                 <li
                   key={char.id}
