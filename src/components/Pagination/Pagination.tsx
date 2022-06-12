@@ -17,7 +17,7 @@ import './Pagination.scss';
 import { useAppDispatch, useAppSelector } from '../../store';
 
 import {
-  loadCharsFromServer,
+  loadPageOfCharsFromServer,
   selectors,
 } from '../../store/CharsListReducer';
 
@@ -52,7 +52,7 @@ export const Pagination: React.FC = memo(() => {
       setPrevDisability(true);
     }
 
-    dispatch(loadCharsFromServer(+currentPage));
+    dispatch(loadPageOfCharsFromServer(+currentPage));
   }, [currentPage, total]);
 
   return (

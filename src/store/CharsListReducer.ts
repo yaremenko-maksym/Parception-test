@@ -2,7 +2,7 @@
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '.';
-import { getAllCharactersFromServer, getCharacterByIDFromServer, getFilteredCharactersFromServer } from '../api/api';
+import { getPageOfCharactersFromServer, getCharacterByIDFromServer, getFilteredCharactersFromServer } from '../api/api';
 import { Character } from '../types/Character';
 import { User } from '../types/User';
 
@@ -34,17 +34,17 @@ const initialState: CharsListState = {
   totalChars: 0,
 };
 
-export const loadCharsFromServer = createAsyncThunk(
-  'CharsList/loadChars',
+export const loadPageOfCharsFromServer = createAsyncThunk(
+  'CharsList/loadPageOfChars',
   async (page: number) => {
-    const response = await getAllCharactersFromServer(page);
+    const response = await getPageOfCharactersFromServer(page);
 
     return response;
   },
 );
 
 export const loadCharByIDFromServer = createAsyncThunk(
-  'CharsList/loadCharByID',
+  'CharsList/loadCharPageByID',
   async (id: number) => {
     const response = await getCharacterByIDFromServer(id);
 
@@ -133,7 +133,7 @@ const CharsListReducer = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(loadCharsFromServer.fulfilled, (state, action) => {
+    builder.addCase(loadPageOfCharsFromServer.fulfilled, (state, action) => {
       state.chars = action.payload.results;
       state.nextPage = action.payload.info.next;
       state.prevPage = action.payload.info.prev;

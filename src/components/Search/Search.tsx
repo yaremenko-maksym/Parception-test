@@ -14,7 +14,6 @@ import { useAppDispatch, useAppSelector } from '../../store';
 import {
   loadFilteredCharactersFromServer,
   selectors,
-  setCurrentChar,
   setCurrentQuery,
 } from '../../store/CharsListReducer';
 
@@ -47,13 +46,21 @@ export const Search: React.FC = memo(() => {
     setShowSuggestions(true);
   }, [nameQuery]);
 
+  const handleChoose = useCallback(() => {
+    setUserInput(filteredChars[activeSuggestion].name);
+    setShowSuggestions(false);
+    setActiveSuggestion(0);
+    navigate(`/list/${filteredChars[activeSuggestion].id}`);
+  }, [filteredChars, activeSuggestion]);
+
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.code === 'Enter') {
+      e.preventDefault();
+
       setUserInput(filteredChars[activeSuggestion].name);
       setActiveSuggestion(0);
       setShowSuggestions(false);
-      dispatch(setCurrentChar(null));
-      navigate(`/${filteredChars[activeSuggestion].id}`);
+      navigate(`/list/${filteredChars[activeSuggestion].id}`);
     }
 
     if (e.code === 'Tab') {
@@ -85,7 +92,7 @@ export const Search: React.FC = memo(() => {
         return (
           <ul
             className={classNames(
-              'list-group list-group-light',
+              'list-group list-group-light my-dropdown',
               styles.suggestionsList,
             )}
           >
@@ -93,16 +100,13 @@ export const Search: React.FC = memo(() => {
               return (
                 <li
                   key={char.id}
-                  onClick={() => {
-                    setShowSuggestions(false);
-                    navigate(`/list/${char.id}`);
-                  }}
+                  onClick={() => handleChoose()}
                   onMouseEnter={() => {
                     setActiveSuggestion(index);
                   }}
                   className={classNames(
                     'list-group-item px-3 border-0',
-                    styles.suggestionsList__item,
+                    { 'bg-success': index === activeSuggestion },
                   )}
                 >
                   {char.name}
@@ -136,7 +140,9 @@ export const Search: React.FC = memo(() => {
   }, [userInput, showSuggestions, activeSuggestion, filteredChars]);
 
   return (
-    <form className="input-group w-auto my-auto d-sm-flex">
+    <form
+      className="input-group w-auto my-auto d-sm-flex"
+    >
       <input
         type="text"
         value={userInput}

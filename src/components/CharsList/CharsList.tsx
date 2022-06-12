@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '../../store';
 import {
   setCurrentUserDislikedChars,
   setCurrentUserLikedChars,
-  loadCharsFromServer,
+  loadPageOfCharsFromServer,
   selectors,
   setCurrentChar,
   setIsListLoading,
@@ -34,8 +34,8 @@ export const CharsList: React.FC = memo(() => {
 
   useEffect(() => {
     dispatch(setIsListLoading(true));
-    dispatch(loadCharsFromServer(+page));
-  }, []);
+    dispatch(loadPageOfCharsFromServer(+page));
+  }, [page]);
 
   return (
     <>
