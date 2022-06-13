@@ -1,5 +1,4 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
-/* eslint-disable jsx-a11y/interactive-supports-focus */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import classNames from 'classnames';
@@ -71,6 +70,10 @@ export const Search: React.FC = memo(() => {
     }
 
     if (e.code === 'Tab') {
+      if (!filteredChars.length) {
+        return;
+      }
+
       setUserInput(filteredChars[activeSuggestion].name);
       setActiveSuggestion(0);
       setShowSuggestions(false);
@@ -91,7 +94,7 @@ export const Search: React.FC = memo(() => {
 
       setActiveSuggestion((prevValue) => prevValue + 1);
     }
-  }, [activeSuggestion, filteredChars]);
+  }, [activeSuggestion, filteredChars, nameQuery]);
 
   const suggestionsListComponent = useMemo(() => {
     if (showSuggestions && userInput) {
@@ -161,9 +164,28 @@ export const Search: React.FC = memo(() => {
         style={{ minWidth: '125px' }}
       />
       {suggestionsListComponent}
-      <span className="input-group-text border-0 d-flex">
-        <i role="button" className="fas fa-search myLink" onClick={handleChoose}></i>
-      </span>
+      <button
+        type="button"
+        onClick={handleChoose}
+        className="input-group-text border-0 d-flex"
+        onKeyDown={(e) => {
+          if (e.code === 'Enter') {
+            e.preventDefault();
+
+            setUserInput('');
+            setActiveSuggestion(0);
+            setShowSuggestions(false);
+
+            if (!filteredChars.length) {
+              return;
+            }
+
+            navigate(`/list/${filteredChars[activeSuggestion].id}`);
+          }
+        }}
+      >
+        <i className="fas fa-search myLink"></i>
+      </button>
     </form>
   );
 });
