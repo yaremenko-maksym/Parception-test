@@ -184,7 +184,7 @@ export const Search: React.FC = memo(() => {
           }
         }}
       >
-        <i role="button" className="fas fa-search myLink"></i>
+        <i className="fas fa-search myLink"></i>
       </button>
     </form>
   );
