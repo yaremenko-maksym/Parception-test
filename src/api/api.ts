@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { CharactersResponse } from '../types/CharactersResponse';
 
 export const BASE_URL = 'https://rickandmortyapi.com/api';
@@ -6,6 +7,10 @@ export const getPageOfCharactersFromServer = async (
   page: number,
 ): Promise<CharactersResponse> => {
   const response = await fetch(`${BASE_URL}/character?page=${page}`);
+
+  if (!response.ok) {
+    throw new Error();
+  }
 
   return response.json();
 };

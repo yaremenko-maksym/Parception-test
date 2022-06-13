@@ -42,7 +42,7 @@ export const Header: React.FC = memo(() => {
 
   return (
     <header>
-      <nav className="navbar navbar-expand-lg navbar-light bg-dark">
+      <nav className="navbar navbar-expand-lg bg-dark">
         <div className="container-fluid">
           <button
             className="navbar-toggler"
@@ -70,7 +70,7 @@ export const Header: React.FC = memo(() => {
               <li className="nav-item active">
                 <NavLink
                   to="/"
-                  className="nav-link text-light"
+                  className="nav-link myLink"
                 >
                   Characters List
                 </NavLink>
@@ -91,7 +91,7 @@ export const Header: React.FC = memo(() => {
                   data-mdb-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  <div className="nav-link text-light">
+                  <div className="nav-link ps-0 myLink">
                     {user.name}
                   </div>
 
@@ -104,20 +104,20 @@ export const Header: React.FC = memo(() => {
                   />
                 </a>
                 <ul
-                  className="dropdown-menu dropdown-menu-end bg-dark"
+                  className="dropdown-menu dropdown-menu-start bg-dark"
                   aria-labelledby="navbarDropdownMenuAvatar"
                 >
                   <li>
                     <NavLink
                       to="/profile"
-                      className="dropdown-item text-light"
+                      className="dropdown-item myLink btn"
                     >
                       My profile
                     </NavLink>
                   </li>
                   <li>
                     <a
-                      className="dropdown-item text-light btn btn-danger"
+                      className="dropdown-item btn btn-danger myLink"
                       href="#"
                       onClick={() => {
                         dispatch(setUser(null));

@@ -63,3 +63,13 @@ table {
     border-radius: 10px;
   }
 }
+
+.myLink {
+  box-shadow: none;
+  color: #FBFBFB;
+
+  &:hover {
+    box-shadow: none;
+    color: #00b74a;
+  }
+}

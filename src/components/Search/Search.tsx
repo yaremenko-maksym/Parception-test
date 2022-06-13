@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/control-has-associated-label */
+/* eslint-disable jsx-a11y/interactive-supports-focus */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import classNames from 'classnames';
@@ -57,9 +59,14 @@ export const Search: React.FC = memo(() => {
     if (e.code === 'Enter') {
       e.preventDefault();
 
-      setUserInput(filteredChars[activeSuggestion].name);
+      setUserInput('');
       setActiveSuggestion(0);
       setShowSuggestions(false);
+
+      if (!filteredChars.length) {
+        return;
+      }
+
       navigate(`/list/${filteredChars[activeSuggestion].id}`);
     }
 
@@ -155,7 +162,7 @@ export const Search: React.FC = memo(() => {
       />
       {suggestionsListComponent}
       <span className="input-group-text border-0 d-flex">
-        <i className="fas fa-search text-light"></i>
+        <i role="button" className="fas fa-search myLink" onClick={handleChoose}></i>
       </span>
     </form>
   );

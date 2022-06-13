@@ -58,9 +58,6 @@ export const Pagination: React.FC = memo(() => {
   return (
     <div className="container pagination-container bg-dark d-flex justify-content-center align-items-center">
       <nav className="Page navigation example">
-        {/* <p className="pagination__title">
-        {`${firstElementOnPage} - ${lastElementOnPage} of ${total}`}
-      </p> */}
 
         <div className="pagination">
           <button

@@ -7,7 +7,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import classNames from 'classnames';
 
 import { useAppDispatch, useAppSelector } from '../../store';
@@ -25,6 +25,7 @@ import './CharPage.scss';
 
 export const CharPage: React.FC = memo(() => {
   const { charID } = useParams();
+  const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
 
@@ -35,6 +36,7 @@ export const CharPage: React.FC = memo(() => {
   const currentChar = useAppSelector(selectors.getCurrentChar);
   const isCharPageLoading = useAppSelector(selectors.getIsCharPageLoading);
   const user = useAppSelector(selectors.getUser);
+  const totalChars = useAppSelector(selectors.getTotalChars);
 
   const currentCharDate = useMemo(() => {
     if (currentChar) {
@@ -52,6 +54,7 @@ export const CharPage: React.FC = memo(() => {
 
   const handleNewImgUpload = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
+
     if (!urlValidator(newPhotoUrl)) {
       setIsURLValid(false);
 
@@ -61,11 +64,16 @@ export const CharPage: React.FC = memo(() => {
     setIsURLValid(true);
     setIsPhotoChangeInputVisible(false);
     dispatch(setCurrentCharPhoto(newPhotoUrl));
-  }, []);
+  }, [newPhotoUrl]);
 
   useEffect(() => {
     if (charID) {
       dispatch(setIsCharPageLoading(true));
+
+      if (+charID > totalChars || +charID < 0 || Number.isNaN(+charID)) {
+        navigate('/list');
+      }
+
       dispatch(loadCharByIDFromServer(+charID));
     }
   }, [charID]);
@@ -87,7 +95,7 @@ export const CharPage: React.FC = memo(() => {
               <img
                 src={currentChar.image}
                 alt={`${currentChar.name} poster`}
-                className="img-thumbnail"
+                className="img-thumbnail char-image"
               />
 
               {user && (
@@ -98,8 +106,8 @@ export const CharPage: React.FC = memo(() => {
                         type="text"
                         value={newPhotoUrl}
                         onChange={({ target }) => {
-                          setIsURLValid(true);
                           setNewPhotoUrl(target.value);
+                          setIsURLValid(true);
                         }}
                         placeholder="Image URL..."
                         className="form-control mb-1"

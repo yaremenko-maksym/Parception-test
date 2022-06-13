@@ -37,9 +37,13 @@ const initialState: CharsListState = {
 export const loadPageOfCharsFromServer = createAsyncThunk(
   'CharsList/loadPageOfChars',
   async (page: number) => {
-    const response = await getPageOfCharactersFromServer(page);
+    try {
+      const response = await getPageOfCharactersFromServer(page);
 
-    return response;
+      return response;
+    } catch {
+      return 'Error';
+    }
   },
 );
 
@@ -134,6 +138,17 @@ const CharsListReducer = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(loadPageOfCharsFromServer.fulfilled, (state, action) => {
+      if (action.payload === 'Error') {
+        state.chars = [];
+        state.nextPage = null;
+        state.prevPage = null;
+        state.pagesCount = 1;
+        state.totalChars = 0;
+        state.isListLoading = false;
+
+        return;
+      }
+
       state.chars = action.payload.results;
       state.nextPage = action.payload.info.next;
       state.prevPage = action.payload.info.prev;
