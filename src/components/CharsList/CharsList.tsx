@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useEffect, memo } from 'react';
@@ -31,9 +32,17 @@ export const CharsList: React.FC = memo(() => {
   const dislikedChars = useAppSelector(selectors.getDislikedChars);
   const isListLoading = useAppSelector(selectors.getIsListLoading);
   const user = useAppSelector(selectors.getUser);
+  const maxPages = useAppSelector(selectors.getPagesCount);
 
   useEffect(() => {
     dispatch(setIsListLoading(true));
+
+    if (+page > maxPages || +page < 1 || Number.isNaN(+page)) {
+      navigate('/list/?page=1');
+
+      return;
+    }
+
     dispatch(loadPageOfCharsFromServer(+page));
   }, [page]);
 

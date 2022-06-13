@@ -1,7 +1,5 @@
 import React, { memo } from 'react';
 
-import './Footer.scss';
-
 export const Footer: React.FC = memo(() => {
   return (
     <footer className="bg-dark text-center text-white">
@@ -31,8 +29,16 @@ export const Footer: React.FC = memo(() => {
         </section>
       </div>
 
-      <div className="text-center p-3">
-        Yaremenko Maksym
+      <div className="text-center p-3 d-flex flex-column flex-md-row gap-3 justify-content-center align-items-center">
+        {'Prodject by Yaremenko Maksym '}
+        <a
+          className="myLink btn"
+          target="_blank"
+          href="https://www.freeprivacypolicy.com/live/91818545-f675-46d1-861b-eb73bf20319a"
+          rel="noreferrer"
+        >
+          Privacy Policy
+        </a>
       </div>
     </footer>
   );
