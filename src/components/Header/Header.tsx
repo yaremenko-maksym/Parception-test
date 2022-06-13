@@ -134,7 +134,7 @@ export const Header: React.FC = memo(() => {
               <div className="nav-link">
                 <FacebookLogin
                   appId="3056667237918240"
-                  autoLoad={false}
+                  autoLoad
                   fields="name,picture"
                   callback={responseFacebook}
                   icon="fa-facebook"
