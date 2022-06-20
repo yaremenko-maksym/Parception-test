@@ -1,41 +1,32 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+import classNames from 'classnames';
 import React, { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import classNames from 'classnames';
-
 import { useAppDispatch, useAppSelector } from '../../store';
-
-import {
-  setCurrentChar,
-} from '../../store/CharsListReducer';
-
-import {
-  UserSelectors,
-  setCurrentUserDislikedChars,
-  setCurrentUserLikedChars,
-} from '../../store/UserReducer';
-
-import './CharsList.scss';
-import { Character } from '../../types/Character';
+import { setCurrentLocation } from '../../store/LocationListReducer';
+import { setCurrentUserDislikedLocations, setCurrentUserLikedLocations, UserSelectors } from '../../store/UserReducer';
+import { Location } from '../../types/Location';
 
 type Props = {
-  charsArray: Character[];
+  locationsArray: Location[],
 };
 
-export const CharsList: React.FC<Props> = memo(({ charsArray }) => {
+export const LocationsList: React.FC<Props> = memo(({
+  locationsArray,
+}) => {
   const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
-  const likedChars = useAppSelector(UserSelectors.getLikedChars);
-  const dislikedChars = useAppSelector(UserSelectors.getDislikedChars);
+  const likedLocations = useAppSelector(UserSelectors.getLikedLocations);
+  const dislikedLocations = useAppSelector(UserSelectors.getDislikedLocations);
   const user = useAppSelector(UserSelectors.getUser);
 
   return (
     <ul className="list-group list-group-light">
-      {charsArray.map(char => (
+      {locationsArray.map(location => (
         <li
-          key={char.id}
+          key={location.id}
           className="
                 myLink
                 clickable
@@ -50,33 +41,22 @@ export const CharsList: React.FC<Props> = memo(({ charsArray }) => {
                 align-items-lg-center
                 border-success"
           onClick={() => {
-            dispatch(setCurrentChar(null));
-            navigate(`/characters/${char.id}`);
+            dispatch(setCurrentLocation(null));
+            navigate(`/locations/${location.id}`);
           }}
         >
           <div
             className="ms-2 me-2 mb-2 mb-md-0 d-flex justify-content-center align-items-center"
             style={{ gap: '20px' }}
           >
-            <img
-              src={char.image}
-              alt={`${char.name} poster`}
-              className="img-fluid rounded shadow-3 char__image"
-            />
-
             <h3 className="fw-bold">
-              {char.name}
+              {location.name}
             </h3>
 
             <p
-              className={classNames(
-                'badge rounded-pill badge-light',
-                { 'text-success': char.status === 'Alive' },
-                { 'text-danger': char.status === 'Dead' },
-                { 'text-warning': char.status === 'unknown' },
-              )}
+              className="badge rounded-pill badge-light"
             >
-              {char.status}
+              {location.type}
             </p>
           </div>
 
@@ -95,12 +75,12 @@ export const CharsList: React.FC<Props> = memo(({ charsArray }) => {
                 type="button"
                 onClick={(event) => {
                   event.stopPropagation();
-                  dispatch(setCurrentUserLikedChars(char));
+                  dispatch(setCurrentUserLikedLocations(location));
                 }}
                 className={classNames(
                   'btn btn-light btn-floating',
                   {
-                    'bg-success': likedChars[char.id],
+                    'bg-success': likedLocations[location.id],
                   },
                 )}
               >
@@ -111,12 +91,12 @@ export const CharsList: React.FC<Props> = memo(({ charsArray }) => {
                 type="button"
                 onClick={(event) => {
                   event.stopPropagation();
-                  dispatch(setCurrentUserDislikedChars(char));
+                  dispatch(setCurrentUserDislikedLocations(location));
                 }}
                 className={classNames(
                   'btn btn-light btn-floating',
                   {
-                    'bg-danger': dislikedChars[char.id],
+                    'bg-danger': dislikedLocations[location.id],
                   },
                 )}
               >

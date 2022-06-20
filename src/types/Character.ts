@@ -1,20 +1,17 @@
+/* eslint-disable import/no-cycle */
+import { Episode } from './Episode';
+import { Location } from './Location';
+
 export interface Character {
-  id: number,
+  id: number | string,
   name: string,
-  status: string,
-  species: 'Alive' | 'Dead' | 'unknown',
+  status: 'Alive' | 'Dead' | 'unknown',
+  species: string,
   type: string,
   gender: 'Male' | 'Female' | 'Genderless' | 'unknown',
-  origin: {
-    name: string,
-    url: string,
-  },
-  location: {
-    name: string,
-    url: string,
-  },
+  origin: Location,
+  location: Location,
   image: string,
-  episode: string[],
-  url: string,
+  episode: Episode[],
   created: string,
 }

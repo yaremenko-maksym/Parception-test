@@ -2,43 +2,40 @@
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '.';
-import { getPageOfCharactersFromServer, getCharacterByIDFromServer, getFilteredCharactersFromServer } from '../api/api';
+import { getCharacterByIDFromServer, getCharactersFromServer, getFilteredCharactersFromServer } from '../api/characters';
 import { Character } from '../types/Character';
-import { User } from '../types/User';
 
-interface CharsListState {
+interface CharListState {
   chars: Character[],
   currentChar: Character | null,
   filteredCharacters: Character[],
   nameQuery: string,
-  isListLoading: boolean,
+  isCharListLoading: boolean,
   isCharPageLoading: boolean,
   nextPage: string | null,
   prevPage: string | null,
-  user: User | null,
   pagesCount: number,
   totalChars: number,
 }
 
-const initialState: CharsListState = {
+const initialState: CharListState = {
   chars: [],
   currentChar: null,
   filteredCharacters: [],
   nameQuery: '',
-  isListLoading: false,
+  isCharListLoading: false,
   isCharPageLoading: false,
   nextPage: null,
   prevPage: null,
-  user: null,
   pagesCount: 1,
   totalChars: 0,
 };
 
 export const loadPageOfCharsFromServer = createAsyncThunk(
-  'CharsList/loadPageOfChars',
+  'CharList/loadPageOfChars',
   async (page: number) => {
     try {
-      const response = await getPageOfCharactersFromServer(page);
+      const response = await getCharactersFromServer(page);
 
       return response;
     } catch {
@@ -48,7 +45,7 @@ export const loadPageOfCharsFromServer = createAsyncThunk(
 );
 
 export const loadCharByIDFromServer = createAsyncThunk(
-  'CharsList/loadCharPageByID',
+  'CharList/loadCharPageByID',
   async (id: number) => {
     const response = await getCharacterByIDFromServer(id);
 
@@ -57,75 +54,26 @@ export const loadCharByIDFromServer = createAsyncThunk(
 );
 
 export const loadFilteredCharactersFromServer = createAsyncThunk(
-  'CharsList/loadFilteredCharacters',
-  async (query: string) => {
-    const response = await getFilteredCharactersFromServer(query);
+  'CharList/loadFilteredCharacters',
+  async (name: string) => {
+    const response = await getFilteredCharactersFromServer(name);
 
     return response;
   },
 );
 
-const CharsListReducer = createSlice({
-  name: 'CharsListReducer',
+const CharListReducer = createSlice({
+  name: 'CharListReducer',
   initialState,
   reducers: {
     setCurrentChar: (state, action: PayloadAction<Character | null>) => {
       state.currentChar = action.payload;
     },
-    setIsListLoading: (state, action: PayloadAction<boolean>) => {
-      state.isListLoading = action.payload;
+    setIsCharListLoading: (state, action: PayloadAction<boolean>) => {
+      state.isCharListLoading = action.payload;
     },
     setIsCharPageLoading: (state, action: PayloadAction<boolean>) => {
       state.isCharPageLoading = action.payload;
-    },
-    setUser: (state, action: PayloadAction<User | null>) => {
-      state.user = action.payload;
-    },
-    setCurrentUserLikedChars: (state, action: PayloadAction<Character>) => {
-      if (state.user) {
-        if (state.user.likedChars?.some(char => char.id === action.payload.id)) {
-          state.user.likedChars = state.user?.likedChars.filter(char => {
-            return char.id !== action.payload.id;
-          });
-          localStorage.removeItem(state.user.userID);
-          localStorage.setItem(state.user.userID, JSON.stringify(state.user));
-        } else {
-          state.user.likedChars?.push(action.payload);
-          localStorage.removeItem(state.user.userID);
-          localStorage.setItem(state.user.userID, JSON.stringify(state.user));
-        }
-
-        if (state.user?.dislikedChars.some(char => char.id === action.payload.id)) {
-          state.user.dislikedChars = state.user?.dislikedChars.filter(char => {
-            return char.id !== action.payload.id;
-          });
-          localStorage.removeItem(state.user.userID);
-          localStorage.setItem(state.user.userID, JSON.stringify(state.user));
-        }
-      }
-    },
-    setCurrentUserDislikedChars: (state, action: PayloadAction<Character>) => {
-      if (state.user) {
-        if (state.user?.dislikedChars.some(char => char.id === action.payload.id)) {
-          state.user.dislikedChars = state.user?.dislikedChars.filter(char => {
-            return char.id !== action.payload.id;
-          });
-          localStorage.removeItem(state.user.userID);
-          localStorage.setItem(state.user.userID, JSON.stringify(state.user));
-        } else {
-          state.user.dislikedChars?.push(action.payload);
-          localStorage.removeItem(state.user.userID);
-          localStorage.setItem(state.user.userID, JSON.stringify(state.user));
-        }
-
-        if (state.user?.likedChars.some(char => char.id === action.payload.id)) {
-          state.user.likedChars = state.user?.likedChars.filter(char => {
-            return char.id !== action.payload.id;
-          });
-          localStorage.removeItem(state.user.userID);
-          localStorage.setItem(state.user.userID, JSON.stringify(state.user));
-        }
-      }
     },
     setCurrentCharPhoto: (state, action: PayloadAction<string>) => {
       if (state.currentChar) {
@@ -144,25 +92,25 @@ const CharsListReducer = createSlice({
         state.prevPage = null;
         state.pagesCount = 1;
         state.totalChars = 0;
-        state.isListLoading = false;
+        state.isCharListLoading = false;
 
         return;
       }
 
-      state.chars = action.payload.results;
-      state.nextPage = action.payload.info.next;
-      state.prevPage = action.payload.info.prev;
-      state.pagesCount = action.payload.info.pages;
-      state.totalChars = action.payload.info.count;
-      state.isListLoading = false;
+      state.chars = action.payload.data.characters.results;
+      state.nextPage = action.payload.data.characters.info.next;
+      state.prevPage = action.payload.data.characters.info.prev;
+      state.pagesCount = action.payload.data.characters.info.pages;
+      state.totalChars = action.payload.data.characters.info.count;
+      state.isCharListLoading = false;
     });
     builder.addCase(loadCharByIDFromServer.fulfilled, (state, action) => {
-      state.currentChar = action.payload;
+      state.currentChar = action.payload.data.character;
       state.isCharPageLoading = false;
     });
     builder.addCase(loadFilteredCharactersFromServer.fulfilled, (state, action) => {
-      if (action.payload.results) {
-        state.filteredCharacters = action.payload.results;
+      if (action.payload.data.characters.results) {
+        state.filteredCharacters = action.payload.data.characters.results;
       } else {
         state.filteredCharacters = [];
       }
@@ -171,56 +119,44 @@ const CharsListReducer = createSlice({
 });
 
 export const {
-  setIsListLoading,
+  setIsCharListLoading,
   setIsCharPageLoading,
   setCurrentChar,
-  setUser,
-  setCurrentUserLikedChars,
-  setCurrentUserDislikedChars,
   setCurrentCharPhoto,
   setCurrentQuery,
-} = CharsListReducer.actions;
+} = CharListReducer.actions;
 
-export default CharsListReducer.reducer;
+export default CharListReducer.reducer;
 
-export const selectors = {
+export const CharsSelectors = {
   getChars: (state: RootState) => {
-    return state.CharsListReducer.chars;
-  },
-  getLikedChars: (state: RootState) => {
-    return state.CharsListReducer.user?.likedChars;
+    return state.CharListReducer.chars;
   },
   getFilteredCharacters: (state: RootState) => {
-    return state.CharsListReducer.filteredCharacters;
-  },
-  getDislikedChars: (state: RootState) => {
-    return state.CharsListReducer.user?.dislikedChars;
+    return state.CharListReducer.filteredCharacters;
   },
   getCurrentChar: (state: RootState) => {
-    return state.CharsListReducer.currentChar;
+    return state.CharListReducer.currentChar;
   },
-  getIsListLoading: (state: RootState) => {
-    return state.CharsListReducer.isListLoading;
+  getIsCharListLoading: (state: RootState) => {
+    return state.CharListReducer.isCharListLoading;
   },
   getIsCharPageLoading: (state: RootState) => {
-    return state.CharsListReducer.isCharPageLoading;
+    return state.CharListReducer.isCharPageLoading;
   },
   getNextPage: (state: RootState) => {
-    return state.CharsListReducer.nextPage;
+    return state.CharListReducer.nextPage;
   },
   getPrevPage: (state: RootState) => {
-    return state.CharsListReducer.prevPage;
-  },
-  getUser: (state: RootState) => {
-    return state.CharsListReducer.user;
+    return state.CharListReducer.prevPage;
   },
   getTotalChars: (state: RootState) => {
-    return state.CharsListReducer.totalChars;
+    return state.CharListReducer.totalChars;
   },
-  getPagesCount: (state: RootState) => {
-    return state.CharsListReducer.pagesCount;
+  getCharsPagesCount: (state: RootState) => {
+    return state.CharListReducer.pagesCount;
   },
   getNameQuery: (state: RootState) => {
-    return state.CharsListReducer.nameQuery;
+    return state.CharListReducer.nameQuery;
   },
 };

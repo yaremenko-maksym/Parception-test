@@ -1,10 +1,16 @@
 /* eslint-disable import/no-cycle */
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import CharsListReducer from './CharsListReducer';
+import CharListReducer from './CharsListReducer';
+import LocationListReducer from './LocationListReducer';
+import EpisodeListReducer from './EpisodeListReducer';
+import UserReducer from './UserReducer';
 
 const rootReducer = combineReducers({
-  CharsListReducer,
+  CharListReducer,
+  LocationListReducer,
+  EpisodeListReducer,
+  UserReducer,
 });
 
 export const store = configureStore({

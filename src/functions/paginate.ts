@@ -1,7 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-export const paginate = (currentPage: number, lastPage: number) => {
-  const delta = 2;
+export const paginate = (currentPage: number, lastPage: number, delta: number) => {
   const result = [];
 
   for (

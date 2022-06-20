@@ -1,10 +1,10 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAppSelector } from '../../store';
-import { selectors } from '../../store/CharsListReducer';
+import { UserSelectors } from '../../store/UserReducer';
 
 export const RequireAuth = ({ children }: { children: JSX.Element }) => {
-  const user = useAppSelector(selectors.getUser);
+  const user = useAppSelector(UserSelectors.getUser);
 
   if (!user) {
     return <Navigate to="/list" replace />;

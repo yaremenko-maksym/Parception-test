@@ -14,30 +14,40 @@ import { paginate } from '../../functions/paginate';
 
 import './Pagination.scss';
 
-import { useAppDispatch, useAppSelector } from '../../store';
+import { useAppSelector } from '../../store';
 
-import {
-  loadPageOfCharsFromServer,
-  selectors,
-} from '../../store/CharsListReducer';
+import { CharsSelectors } from '../../store/CharsListReducer';
+import { LocationSelectors } from '../../store/LocationListReducer';
+import { EpisodeSelectors } from '../../store/EpisodeListReducer';
 
 export const Pagination: React.FC = memo(() => {
-  const dispatch = useAppDispatch();
-
   const navigate = useNavigate();
-  const searchParams = new URLSearchParams(useLocation().search);
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
   const currentPage = searchParams.get('page') || 1;
 
   const [isPrevDisabled, setPrevDisability] = useState(true);
   const [isNextDisabled, setNextDisability] = useState(false);
 
-  const total = useAppSelector(selectors.getTotalChars);
-  const last = useAppSelector(selectors.getPagesCount);
-  const perPage = useMemo(() => 20, []);
+  const lastCharsPage = useAppSelector(CharsSelectors.getCharsPagesCount);
+  const lastLocationsPage = useAppSelector(LocationSelectors.getLocationsPagesCount);
+  const lastEpisodesPage = useAppSelector(EpisodeSelectors.getEpisodesPageCount);
 
   const visiblePages = useMemo(() => {
-    return paginate(+currentPage, last);
-  }, [currentPage, total, perPage]);
+    switch (true) {
+      case location.pathname.includes('characters'):
+        return paginate(+currentPage, lastCharsPage, 2);
+
+      case location.pathname.includes('locations'):
+        return paginate(+currentPage, lastLocationsPage, 1);
+
+      case location.pathname.includes('episodes'):
+        return paginate(+currentPage, lastEpisodesPage, 2);
+
+      default:
+        return paginate(1, 1, 1);
+    }
+  }, [location, lastCharsPage, lastLocationsPage, lastEpisodesPage]);
 
   useEffect(() => {
     if (+currentPage === visiblePages[visiblePages.length - 1].value) {
@@ -51,9 +61,7 @@ export const Pagination: React.FC = memo(() => {
     } else {
       setPrevDisability(true);
     }
-
-    dispatch(loadPageOfCharsFromServer(+currentPage));
-  }, [currentPage, total]);
+  }, [location, lastCharsPage, lastLocationsPage, lastEpisodesPage]);
 
   return (
     <div className="container pagination-container bg-dark d-flex justify-content-center align-items-center">

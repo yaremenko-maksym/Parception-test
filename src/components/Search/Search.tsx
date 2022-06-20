@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
@@ -5,8 +6,8 @@ import classNames from 'classnames';
 import React, {
   memo,
   useCallback,
-  useMemo,
   useState,
+  useEffect,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import debounce from 'lodash/debounce';
@@ -14,25 +15,45 @@ import debounce from 'lodash/debounce';
 import { useAppDispatch, useAppSelector } from '../../store';
 import {
   loadFilteredCharactersFromServer,
-  selectors,
+  CharsSelectors,
   setCurrentQuery,
 } from '../../store/CharsListReducer';
 
-import styles from './Search.module.scss';
+import './Search.scss';
+import { loadFilteredLocationsFromServer, LocationSelectors } from '../../store/LocationListReducer';
+import { EpisodeSelectors, loadFilteredEpisodesFromServer } from '../../store/EpisodeListReducer';
+
+enum PossibleLists {
+  Characters = 'characters',
+  Locations = 'locations',
+  Episodes = 'episodes',
+}
 
 export const Search: React.FC = memo(() => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const nameQuery = useAppSelector(selectors.getNameQuery);
-  const filteredChars = useAppSelector(selectors.getFilteredCharacters);
+
+  const nameQuery = useAppSelector(CharsSelectors.getNameQuery);
+
+  const filteredChars = useAppSelector(CharsSelectors.getFilteredCharacters);
+  const filteredLocations = useAppSelector(LocationSelectors.getFilteredLocations);
+  const filteredEpisodes = useAppSelector(EpisodeSelectors.getFilteredEpisodes);
 
   const [userInput, setUserInput] = useState(nameQuery);
-  const [activeSuggestion, setActiveSuggestion] = useState(0);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
+  const [
+    activeSuggestionList,
+    setActiveSuggestionList,
+  ] = useState<PossibleLists>(PossibleLists.Characters);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const applyQuery = useCallback(
-    debounce(async (newQuery: string) => {
-      await dispatch(loadFilteredCharactersFromServer(newQuery));
+    debounce((newQuery: string) => {
+      Promise.all([
+        dispatch(loadFilteredCharactersFromServer(newQuery)),
+        dispatch(loadFilteredLocationsFromServer(newQuery)),
+        dispatch(loadFilteredEpisodesFromServer(newQuery)),
+      ]);
       dispatch(setCurrentQuery(newQuery));
     }, 500),
     [nameQuery],
@@ -43,111 +64,133 @@ export const Search: React.FC = memo(() => {
 
     setUserInput(currentInput);
     applyQuery(currentInput);
-    setActiveSuggestion(0);
+    setActiveSuggestionIndex(0);
     setShowSuggestions(true);
-  }, [nameQuery]);
+  }, [nameQuery, activeSuggestionIndex, activeSuggestionList]);
 
-  const handleChoose = useCallback(() => {
-    setUserInput(filteredChars[activeSuggestion].name);
-    setShowSuggestions(false);
-    setActiveSuggestion(0);
-    navigate(`/list/${filteredChars[activeSuggestion].id}`);
-  }, [filteredChars, activeSuggestion]);
+  const handleChoose = useCallback(
+    () => {
+      setUserInput(filteredChars[activeSuggestionIndex].name);
+      setShowSuggestions(false);
+      setActiveSuggestionIndex(0);
+
+      switch (activeSuggestionList) {
+        case PossibleLists.Characters:
+          navigate(`/${activeSuggestionList}/${filteredChars[activeSuggestionIndex].id}`);
+          break;
+
+        case PossibleLists.Locations:
+          navigate(`/${activeSuggestionList}/${filteredLocations[activeSuggestionIndex].id}`);
+          break;
+
+        case PossibleLists.Episodes:
+          navigate(`/${activeSuggestionList}/${filteredEpisodes[activeSuggestionIndex].id}`);
+          break;
+
+        default:
+      }
+    },
+    [
+      filteredChars,
+      filteredLocations,
+      filteredEpisodes,
+      activeSuggestionIndex,
+      activeSuggestionList,
+      nameQuery,
+    ],
+  );
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.code === 'Enter') {
       e.preventDefault();
 
-      setUserInput('');
-      setActiveSuggestion(0);
-      setShowSuggestions(false);
-
       if (!filteredChars.length) {
         return;
       }
 
-      navigate(`/list/${filteredChars[activeSuggestion].id}`);
+      handleChoose();
     }
 
     if (e.code === 'Tab') {
+      e.preventDefault();
+
       if (!filteredChars.length) {
         return;
       }
 
-      setUserInput(filteredChars[activeSuggestion].name);
-      setActiveSuggestion(0);
+      setUserInput(filteredChars[activeSuggestionIndex].name);
+      setActiveSuggestionIndex(0);
       setShowSuggestions(false);
     }
 
     if (e.code === 'ArrowUp') {
-      if (activeSuggestion === 0) {
-        return;
+      e.preventDefault();
+
+      if (activeSuggestionIndex === 0) {
+        if (activeSuggestionList === PossibleLists.Characters) {
+          return;
+        }
+
+        if (activeSuggestionList === PossibleLists.Locations) {
+          setActiveSuggestionIndex(filteredChars.length - 1);
+          setActiveSuggestionList(PossibleLists.Characters);
+
+          return;
+        }
+
+        if (activeSuggestionList === PossibleLists.Episodes) {
+          setActiveSuggestionIndex(filteredLocations.length - 1);
+          setActiveSuggestionList(PossibleLists.Locations);
+
+          return;
+        }
       }
 
-      setActiveSuggestion((prevValue) => prevValue - 1);
+      setActiveSuggestionIndex((prevValue) => prevValue - 1);
     }
 
     if (e.code === 'ArrowDown') {
-      if (activeSuggestion + 1 === filteredChars.length) {
-        return;
+      e.preventDefault();
+
+      if ([
+        filteredChars.length,
+        filteredLocations.length,
+        filteredEpisodes.length,
+      ].includes(activeSuggestionIndex + 1)) {
+        if (activeSuggestionList === PossibleLists.Characters) {
+          setActiveSuggestionIndex(0);
+          setActiveSuggestionList(PossibleLists.Locations);
+
+          return;
+        }
+
+        if (activeSuggestionList === PossibleLists.Locations) {
+          setActiveSuggestionIndex(0);
+          setActiveSuggestionList(PossibleLists.Episodes);
+
+          return;
+        }
+
+        if (activeSuggestionList === PossibleLists.Episodes) {
+          return;
+        }
       }
 
-      setActiveSuggestion((prevValue) => prevValue + 1);
+      setActiveSuggestionIndex((prevValue) => prevValue + 1);
     }
-  }, [activeSuggestion, filteredChars, nameQuery]);
+  }, [activeSuggestionIndex, activeSuggestionList, filteredChars, nameQuery]);
 
-  const suggestionsListComponent = useMemo(() => {
-    if (showSuggestions && userInput) {
-      if (filteredChars.length) {
-        return (
-          <ul
-            className={classNames(
-              'list-group list-group-light my-dropdown',
-              styles.suggestionsList,
-            )}
-          >
-            {filteredChars.map((char, index) => {
-              return (
-                <li
-                  key={char.id}
-                  onClick={() => handleChoose()}
-                  onMouseEnter={() => {
-                    setActiveSuggestion(index);
-                  }}
-                  className={classNames(
-                    'list-group-item px-3 border-0',
-                    { 'bg-success': index === activeSuggestion },
-                  )}
-                >
-                  {char.name}
-                </li>
-              );
-            })}
-          </ul>
-        );
-      }
+  useEffect(() => {
+    if (filteredChars.length !== 0) {
+      setActiveSuggestionList(PossibleLists.Characters);
 
-      return (
-        <div
-          className={classNames(
-            'list-group list-group-light',
-            styles.suggestionsList,
-          )}
-        >
-          <p
-            className={classNames(
-              'list-group-item px-3 border-0',
-              styles.suggestionsList__item,
-            )}
-          >
-            Nothing...
-          </p>
-        </div>
-      );
+      return;
     }
 
-    return null;
-  }, [userInput, showSuggestions, activeSuggestion, filteredChars]);
+    if (filteredLocations.length !== 0) {
+      setActiveSuggestionList(PossibleLists.Locations);
+    }
+  }, [filteredChars, filteredLocations]);
 
   return (
     <form
@@ -163,7 +206,89 @@ export const Search: React.FC = memo(() => {
         placeholder="Search"
         style={{ minWidth: '125px' }}
       />
-      {suggestionsListComponent}
+      {showSuggestions && userInput && (
+        <ul
+          className="bg-light my-dropdown suggestionsList"
+        >
+          {filteredChars.length !== 0 && (
+            <>
+              <span
+                className="bg-light border-bottom p-1 border-dark suggestionsList__category"
+              >
+                Characters :
+              </span>
+              {filteredChars.map((char, index) => (
+                <li
+                  key={char.id}
+                  onClick={handleChoose}
+                  onMouseEnter={() => {
+                    setActiveSuggestionList(PossibleLists.Characters);
+                    setActiveSuggestionIndex(index);
+                  }}
+                  className={classNames(
+                    'suggestionsList__item border-0',
+                    { 'bg-success': index === activeSuggestionIndex && activeSuggestionList === PossibleLists.Characters },
+                  )}
+                >
+                  {char.name}
+                </li>
+              ))}
+            </>
+          )}
+
+          {filteredLocations.length !== 0 && (
+            <>
+              <span
+                className="bg-light border-bottom p-1 border-dark suggestionsList__category"
+              >
+                Locations :
+              </span>
+              {filteredLocations.map((location, index) => (
+                <li
+                  key={location.id}
+                  onClick={handleChoose}
+                  onMouseEnter={() => {
+                    setActiveSuggestionList(PossibleLists.Locations);
+                    setActiveSuggestionIndex(index);
+                  }}
+                  className={classNames(
+                    'suggestionsList__item border-0',
+                    { 'bg-success': index === activeSuggestionIndex && activeSuggestionList === PossibleLists.Locations },
+                  )}
+                >
+                  {location.name}
+                </li>
+              ))}
+            </>
+          )}
+
+          {filteredEpisodes.length !== 0 && (
+            <>
+              <span
+                className="bg-light border-bottom p-1 border-dark suggestionsList__category"
+              >
+                Episodes :
+              </span>
+              {filteredEpisodes.map((episode, index) => (
+                <li
+                  key={episode.id}
+                  onClick={handleChoose}
+                  onMouseEnter={() => {
+                    setActiveSuggestionList(PossibleLists.Episodes);
+                    setActiveSuggestionIndex(index);
+                  }}
+                  className={classNames(
+                    'suggestionsList__item border-0',
+                    { 'bg-success': index === activeSuggestionIndex && activeSuggestionList === PossibleLists.Episodes },
+                  )}
+                >
+                  {episode.name}
+                </li>
+              ))}
+            </>
+          )}
+        </ul>
+      )}
       <button
         type="button"
         onClick={handleChoose}
@@ -173,14 +298,14 @@ export const Search: React.FC = memo(() => {
             e.preventDefault();
 
             setUserInput('');
-            setActiveSuggestion(0);
+            setActiveSuggestionIndex(0);
             setShowSuggestions(false);
 
             if (!filteredChars.length) {
               return;
             }
 
-            navigate(`/list/${filteredChars[activeSuggestion].id}`);
+            navigate(`/${PossibleLists.Characters}/${filteredChars[activeSuggestionIndex].id}`);
           }
         }}
       >
