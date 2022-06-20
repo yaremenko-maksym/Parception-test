@@ -7,14 +7,15 @@ import './Header.scss';
 
 import { FacebookResponse } from '../../types/FacebookResponse';
 import { useAppDispatch, useAppSelector } from '../../store';
-import { selectors, setUser } from '../../store/CharsListReducer';
 import { Search } from '../Search/Search';
+import { setUser, UserSelectors } from '../../store/UserReducer';
+import { User } from '../../types/User';
 
 export const Header: React.FC = memo(() => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(useLocation().search);
-  const user = useAppSelector(selectors.getUser);
+  const user = useAppSelector(UserSelectors.getUser);
 
   const responseFacebook = useCallback((response: FacebookResponse) => {
     try {
@@ -24,12 +25,16 @@ export const Header: React.FC = memo(() => {
         return;
       }
 
-      const userObject = {
+      const userObject: User = {
         name: response.name,
         image: response.picture.data.url,
         userID: response.userID,
-        likedChars: [],
-        dislikedChars: [],
+        likedChars: {},
+        dislikedChars: {},
+        likedLocations: {},
+        dislikedLocations: {},
+        likedEpisodes: {},
+        dislikedEpisodes: {},
       };
 
       localStorage.setItem(response.userID, JSON.stringify(userObject));
@@ -67,16 +72,46 @@ export const Header: React.FC = memo(() => {
             </a>
 
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-              <li className="nav-item active">
+              <li className="nav-item">
                 <NavLink
                   to="/"
                   className="nav-link myLink"
+                  end
                 >
-                  Characters List
+                  Home
+                </NavLink>
+              </li>
+
+              <li className="nav-item">
+                <NavLink
+                  to="/characters"
+                  className="nav-link myLink"
+                  end
+                >
+                  Characters
+                </NavLink>
+              </li>
+
+              <li className="nav-item">
+                <NavLink
+                  to="/locations"
+                  className="nav-link myLink"
+                  end
+                >
+                  Locations
+                </NavLink>
+              </li>
+
+              <li className="nav-item">
+                <NavLink
+                  to="/episodes"
+                  className="nav-link myLink"
+                  end
+                >
+                  Episodes
                 </NavLink>
               </li>
             </ul>
-
             <Search />
           </div>
 
@@ -135,11 +170,13 @@ export const Header: React.FC = memo(() => {
                 <FacebookLogin
                   appId="3056667237918240"
                   autoLoad
+                  scope="public_profile"
                   fields="name,picture"
                   callback={responseFacebook}
                   icon="fa-facebook"
                   textButton="LOGIN"
                   cssClass="facebook"
+                  authType="reauthorize"
                 />
               </div>
             )}

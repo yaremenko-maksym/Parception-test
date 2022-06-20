@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, {
@@ -7,13 +8,17 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import {
+  Link,
+  useNavigate,
+  useParams,
+} from 'react-router-dom';
 import classNames from 'classnames';
 
 import { useAppDispatch, useAppSelector } from '../../store';
 import {
   loadCharByIDFromServer,
-  selectors,
+  CharsSelectors,
   setCurrentCharPhoto,
   setIsCharPageLoading,
 } from '../../store/CharsListReducer';
@@ -22,6 +27,7 @@ import { Loader } from '../Loader';
 import { urlValidator } from '../../functions/URLValidator';
 
 import './CharPage.scss';
+import { UserSelectors } from '../../store/UserReducer';
 
 export const CharPage: React.FC = memo(() => {
   const { charID } = useParams();
@@ -33,10 +39,10 @@ export const CharPage: React.FC = memo(() => {
   const [isURLValid, setIsURLValid] = useState(true);
   const [newPhotoUrl, setNewPhotoUrl] = useState('');
 
-  const currentChar = useAppSelector(selectors.getCurrentChar);
-  const isCharPageLoading = useAppSelector(selectors.getIsCharPageLoading);
-  const user = useAppSelector(selectors.getUser);
-  const totalChars = useAppSelector(selectors.getTotalChars);
+  const currentChar = useAppSelector(CharsSelectors.getCurrentChar);
+  const isCharPageLoading = useAppSelector(CharsSelectors.getIsCharPageLoading);
+  const user = useAppSelector(UserSelectors.getUser);
+  const totalChars = useAppSelector(CharsSelectors.getTotalChars);
 
   const currentCharDate = useMemo(() => {
     if (currentChar) {
@@ -63,6 +69,7 @@ export const CharPage: React.FC = memo(() => {
 
     setIsURLValid(true);
     setIsPhotoChangeInputVisible(false);
+    setNewPhotoUrl('');
     dispatch(setCurrentCharPhoto(newPhotoUrl));
   }, [newPhotoUrl]);
 
@@ -70,13 +77,16 @@ export const CharPage: React.FC = memo(() => {
     if (charID) {
       dispatch(setIsCharPageLoading(true));
 
-      if (+charID > totalChars || +charID < 0 || Number.isNaN(+charID)) {
-        navigate('/list');
+      if (totalChars !== 0
+        && (+charID > totalChars || +charID < 0 || Number.isNaN(+charID))) {
+        navigate('/characters');
+
+        return;
       }
 
       dispatch(loadCharByIDFromServer(+charID));
     }
-  }, [charID]);
+  }, [charID, totalChars]);
 
   return (
     <div className="container charPage-container bg-dark">
@@ -85,7 +95,7 @@ export const CharPage: React.FC = memo(() => {
       {currentChar && (
         <div className="d-flex flex-column">
           <div>
-            <h2 className="text-light">
+            <h2 className="display-3 text-light mb-5 border-bottom border-success">
               {currentChar.name}
             </h2>
           </div>
@@ -119,9 +129,7 @@ export const CharPage: React.FC = memo(() => {
 
                       <button
                         type="submit"
-                        onClick={(event) => {
-                          handleNewImgUpload(event);
-                        }}
+                        onClick={handleNewImgUpload}
                         className="text-light btn btn-success mb-1"
                       >
                         Apply Change
@@ -158,8 +166,39 @@ export const CharPage: React.FC = memo(() => {
               </h3>
 
               <h3 className="text-light">
-                {'Location: '}
-                {currentChar.location.name}
+                {'Last known location: '}
+                {currentChar.location.name !== 'unknown'
+                  ? (
+                    <Link
+                      to={`/locations/${currentChar.location.id}`}
+                      className="text-success"
+                    >
+                      {currentChar.location.name}
+                    </Link>
+                  )
+                  : (
+                    <span className="text-warning">
+                      {currentChar.location.name}
+                    </span>
+                  )}
+              </h3>
+
+              <h3 className="text-light">
+                {'Origin location: '}
+                {currentChar.origin.name !== 'unknown'
+                  ? (
+                    <Link
+                      to={`/locations/${currentChar.origin.id}`}
+                      className="text-success"
+                    >
+                      {currentChar.origin.name}
+                    </Link>
+                  )
+                  : (
+                    <span className="text-warning">
+                      {currentChar.origin.name}
+                    </span>
+                  )}
               </h3>
 
               <button
@@ -174,23 +213,33 @@ export const CharPage: React.FC = memo(() => {
               <ul
                 className="dropdown-menu my-dropdown"
               >
-                {currentChar.episode.map(link => (
+                {currentChar.episode.map(episode => (
                   <li
-                    key={link}
+                    key={episode.id}
                     className="dropdown-item"
+                    onClick={() => {
+                      navigate(`/episodes/${episode.id}`);
+                    }}
                   >
-                    {link.split('/')[5]}
+                    <b className="text-success">
+                      {`${episode.episode}: `}
+                    </b>
+                    {episode.name}
                   </li>
                 ))}
               </ul>
 
-              <h3 className={classNames(
-                { 'text-success': currentChar.status === 'Alive' },
-                { 'text-danger': currentChar.status === 'Dead' },
-                { 'text-warning': currentChar.status === 'unknown' },
-              )}
-              >
-                {currentChar.status}
+              <h3 className="text-light">
+                {'Status: '}
+                <span
+                  className={classNames(
+                    { 'text-success': currentChar.status === 'Alive' },
+                    { 'text-danger': currentChar.status === 'Dead' },
+                    { 'text-warning': currentChar.status === 'unknown' },
+                  )}
+                >
+                  {currentChar.status}
+                </span>
               </h3>
 
               <h3 className="text-light">

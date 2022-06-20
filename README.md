@@ -20,7 +20,7 @@ React, TypeScript, React Router v6, Redux Toolkit, SCSS, Facebook Auth API, MDBo
 
 `Like/dislike` - To like/dislike you need to authorize with facebook 
 
-`Saved list of liked/disliked characters` - Data about your liked/disliked characters saved in `localStorage`
+`Saved list of liked/disliked` - Data about your liked/disliked characters/locations/episodes saved in `localStorage`
 
 `Change character photo` - Only for authorized users
 
